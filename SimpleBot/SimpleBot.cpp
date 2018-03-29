@@ -3,9 +3,7 @@
 
 #include <boost/program_options.hpp>
 
-#include <set>
 #include <string>
-#include <iostream>
 
 struct ProgramSettings
 {
