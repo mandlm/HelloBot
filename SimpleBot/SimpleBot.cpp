@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 		
 		tgbot::LongPollBot bot(settings.token, { tgbot::types::UpdateType::MESSAGE });
 
-		std::cout << "connected as " << bot.getMe().firstName << std::endl;
+		bot.getLogger().info(std::string("connected as ") + bot.getMe().firstName);
 
 		MessageHandler messageHandler;
 		bot.callback([&messageHandler]
@@ -59,10 +59,12 @@ int main(int argc, char **argv)
 	}
 	catch (std::runtime_error &e)
 	{
-		std::cout << "exiting." << std::endl;
+		std::cout << "aborting." << std::endl;
 	
 		return EXIT_FAILURE;
 	}
+
+	std::cout << "exiting." << std::endl;
 
 	return EXIT_SUCCESS;
 }
