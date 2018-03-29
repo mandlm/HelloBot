@@ -16,9 +16,11 @@ void MessageHandler::handle(const tgbot::types::Message &message, const tgbot::m
 		return;
 	}
 
-	std::cout << message.from->firstName
+	std::ostringstream logMessage;
+	logMessage << message.from->firstName
 		<< " (" << *message.from->username << "): " 
-		<< (message.text != nullptr ? *message.text : "<no text>") << std::endl;
+		<< (message.text != nullptr ? *message.text : "<no text>");
+	api.getLogger().info(logMessage.str());
 
 	std::ostringstream reply;
 	reply << "You said";
