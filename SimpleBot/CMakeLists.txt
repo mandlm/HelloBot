@@ -6,6 +6,7 @@ project(SimpleBot LANGUAGES CXX)
 
 add_executable(${PROJECT_NAME} 
 	SimpleBot.cpp
+	MessageHandler.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

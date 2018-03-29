@@ -1,3 +1,4 @@
+#include "MessageHandler.h"
 #include "tgbot/bot.h"
 
 #include <boost/program_options.hpp>
@@ -5,8 +6,6 @@
 #include <set>
 #include <string>
 #include <iostream>
-
-static const std::set<std::string> knownUsers = { "mandlm" };
 
 struct ProgramSettings
 {
@@ -37,48 +36,6 @@ ProgramSettings getProgramSettings(int argc, char **argv)
 	return ProgramSettings{ configuredOptions["token"].as<std::string>() };
 }
 
-std::string fullName(const tgbot::types::User &user)
-{
-	std::ostringstream fullName;
-	fullName << user.firstName;
-
-	if (user.lastName != nullptr)
-	{
-		fullName << " " << *user.lastName;
-	}
-
-	return fullName.str();
-}
-
-void replyUserUnknown(const tgbot::types::Message &message, const tgbot::methods::Api &api)
-{
-	api.sendMessage(std::to_string(message.chat.id), "Sorry, I don't know who you are.");
-}
-
-void handleMessage(const tgbot::types::Message message, const tgbot::methods::Api &api)
-{
-	if (message.from == nullptr || knownUsers.find(*message.from->username) == knownUsers.cend())
-	{
-		replyUserUnknown(message, api);
-
-		return;
-	}
-
-	std::cout << fullName(*message.from) 
-		<< " (" << *message.from->username << "): " 
-		<< (message.text != nullptr ? *message.text : "<no text>") << std::endl;
-
-	api.sendMessage(std::to_string(message.chat.id), "You said:");
-	if (message.text != nullptr)
-	{
-		api.sendMessage(std::to_string(message.chat.id), *message.text);
-	}
-	else
-	{
-		api.sendMessage(std::to_string(message.chat.id), "illegible things");
-	}
-}
-
 int main(int argc, char **argv)
 {
 	try
@@ -91,7 +48,13 @@ int main(int argc, char **argv)
 
 		std::cout << "connected as " << bot.getMe().firstName << std::endl;
 
-		bot.callback(handleMessage);
+		MessageHandler messageHandler;
+		bot.callback([&messageHandler]
+			(const tgbot::types::Message message, const tgbot::methods::Api &api)
+			{
+				messageHandler.handle(message, api);
+			});
+
 		bot.start();
 	}
 	catch (std::runtime_error &e)
